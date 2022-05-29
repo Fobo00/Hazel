@@ -88,6 +88,7 @@ namespace Hazel
 		{
 			std::stringstream ss;
 			ss << "MouseButtonReleasedEvent: " << m_Button;
+			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(MouseButtonReleased)

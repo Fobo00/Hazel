@@ -8,7 +8,7 @@ namespace Hazel
 	class HAZEL_API WindowResizeEvent : public Event
 	{
 	public:
-		WindowResizeEvent(unsigned int width, unsigned int height)
+		WindowResizeEvent(int width, int height)
 			:m_Width(width), m_Height(height) {}
 
 		inline unsigned int GetWidth() { return m_Width; }
@@ -17,7 +17,7 @@ namespace Hazel
 		std::string ToString()
 		{
 			std::stringstream ss;
-			ss << "WindowResizeEvent: " << m_Width << ", " << m_Height;
+			ss << "WindowResizeEvent: " << GetWidth() << ", " << GetHeight();
 			return ss.str();
 		}
 
