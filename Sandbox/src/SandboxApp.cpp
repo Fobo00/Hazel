@@ -17,8 +17,8 @@ public:
 
 	void OnEvent(Hazel::Event& e) override
 	{
-		HZ_ERROR("{0}", e.ToString());
-		HZ_ERROR("got Event");
+		HZ_INFO("{0}", e.ToString());
+		HZ_TRACE("got Event");
 	}
 };
 
