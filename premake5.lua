@@ -18,6 +18,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
 IncludeDir["GLAD"] = "Hazel/vendor/GLAD/include"
 IncludeDir["ImGui"] = "Hazel/vendor/ImGui"
+IncludeDir["glm"] = "Hazel/vendor/glm"
 
 include "Hazel/vendor/GLAD"
 include "Hazel/vendor/ImGui"
@@ -41,7 +42,8 @@ project "Sandbox"
 	includedirs
 	{
 		"Hazel/vendor/spdlog/include",
-		"Hazel/src"
+		"Hazel/src",
+		"%{IncludeDir.glm}",
 	}
 
 	links 
@@ -88,7 +90,9 @@ project "Hazel"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl",
 	}
 
 	includedirs
@@ -98,6 +102,7 @@ project "Hazel"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLAD}",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}",
 	}
 
 	libdirs
