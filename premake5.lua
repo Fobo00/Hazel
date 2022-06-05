@@ -1,6 +1,9 @@
 workspace "Hazel"
 	architecture "x64"
 
+	startproject "Sandbox"
+
+
 	configurations 
 	{
 		"Debug",
@@ -19,10 +22,12 @@ IncludeDir["ImGui"] = "Hazel/vendor/ImGui"
 include "Hazel/vendor/GLAD"
 include "Hazel/vendor/ImGui"
 
+
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
