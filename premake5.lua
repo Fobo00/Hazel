@@ -43,12 +43,13 @@ project "Sandbox"
 	{
 		"Hazel/vendor/spdlog/include",
 		"Hazel/src",
+		"Hazel/vendor",
 		"%{IncludeDir.glm}",
 	}
 
 	links 
 	{
-		"Hazel"
+		"Hazel",
 	}
 
 	filter "system:windows"

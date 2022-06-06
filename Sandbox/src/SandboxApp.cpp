@@ -1,6 +1,8 @@
 #include "hzpch.h"
 #include <Hazel.h>
 
+static bool showTest = true;
+
 class ExampleLayer : public Hazel::Layer
 {
 public:
@@ -17,6 +19,10 @@ public:
 		{
 			HZ_TRACE("Key Tab pressed!");
 		}
+	}
+
+	void OnImGuiRender() override
+	{
 	}
 
 	void OnEvent(Hazel::Event& event) override
@@ -37,7 +43,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new Hazel::ImGuiLayer());
 	}
 	~Sandbox()
 	{
