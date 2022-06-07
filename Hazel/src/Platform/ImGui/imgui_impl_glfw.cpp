@@ -56,7 +56,7 @@
 //  2016-10-15: Misc: Added a void* user_data parameter to Clipboard function handlers.
 
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
+#include "backends/imgui_impl_glfw.h"
 
 // Clang warnings with -Weverything
 #if defined(__clang__)
