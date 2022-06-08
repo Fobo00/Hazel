@@ -4,8 +4,8 @@
 #include "Hazel/Events/ApplicationEvent.h"
 #include "Hazel/Events/MouseEvent.h"
 #include "Hazel/Events/KeyEvent.h"
-
-#include <glad/glad.h>
+#include "Hazel/Renderer/GraphicsContext.h"
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Hazel
 {
@@ -34,7 +34,7 @@ namespace Hazel
 
 	void WindowsWindow::OnUpdate()
 	{
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers();
 		glfwPollEvents();
 	}
 
@@ -61,6 +61,7 @@ namespace Hazel
 
 		HZ_CORE_INFO("Creating window {0}, ({1}, {2})", props.Title, props.Width, props.Height);
 
+
 		if (!s_GLFWInitialized)
 		{
 			// TODO glfwTerminate on system shutdown
@@ -70,11 +71,12 @@ namespace Hazel
 
 			s_GLFWInitialized = true;
 		}
-
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		HZ_CORE_ASSERT(status, "Failed to initialize GLAD!");
+
+		m_Context = new OpenGLContext(m_Window);
+
+		m_Context->Init();
+		
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 

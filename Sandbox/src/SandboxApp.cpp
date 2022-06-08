@@ -1,5 +1,6 @@
 #include "hzpch.h"
 #include <Hazel.h>
+#include <ImGui/imgui.h>
 
 static bool showTest = true;
 
@@ -23,6 +24,9 @@ public:
 
 	void OnImGuiRender() override
 	{
+		ImGui::Begin("Test");
+		ImGui::Text("aha this test works");
+		ImGui::End();
 	}
 
 	void OnEvent(Hazel::Event& event) override
