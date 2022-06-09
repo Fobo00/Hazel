@@ -36,7 +36,7 @@ public:
 		if (event.GetEventType() == Hazel::EventType::KeyPressed)
 		{
 			Hazel::KeyPressedEvent& e = (Hazel::KeyPressedEvent&)event;
-			HZ_INFO("{0}",(char)e.GetKeyCode());
+			HZ_TRACE("{0}",(char)e.GetKeyCode());
 		}
 	}
 };
