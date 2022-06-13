@@ -26,6 +26,7 @@ public:
 	{
 		ImGui::Begin("Test");
 		ImGui::Text("aha this test works");
+		ImGui::DragFloat("Float", new float);
 		ImGui::End();
 	}
 
