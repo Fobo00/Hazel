@@ -38,7 +38,7 @@ namespace Hazel
 		bool Normalized;
 
 		BufferElement()
-			:Name(NULL), Type(ShaderDataType::None), Offset(NULL), Size(NULL), Normalized(NULL)
+			:Name(""), Type(ShaderDataType::None), Offset(NULL), Size(NULL), Normalized(NULL)
 		{}
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
@@ -127,7 +127,7 @@ namespace Hazel
 
 		virtual uint32_t GetCount() const = 0;
 
-		static IndexBuffer* Create(uint32_t* indices, uint32_t size);
+		static IndexBuffer* Create(uint32_t* indices, uint32_t count);
 	};
 
 }
