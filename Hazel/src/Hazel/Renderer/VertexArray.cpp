@@ -12,8 +12,8 @@ namespace Hazel
 		{
 		default:
 			break;
-		case RendererApi::None:		HZ_CORE_ASSERT(false, "RenderApi::None is currently not supported!");
-		case RendererApi::OpenGL:	return new OpenGLVertexArray();
+		case RendererApi::API::None:		HZ_CORE_ASSERT(false, "RenderApi::None is currently not supported!");
+		case RendererApi::API::OpenGL:	return new OpenGLVertexArray();
 		}
 
 		HZ_CORE_ASSERT(false, "Unknown RenderApi!");
