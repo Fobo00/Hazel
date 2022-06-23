@@ -2,37 +2,30 @@
 #include <Hazel.h>
 #include <ImGui/imgui.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 static bool showTest = true;
 
 class ExampleLayer : public Hazel::Layer
 {
 
 public:
-	void OnAttach() override
-	{
-		throw std::logic_error("The method or operation is not implemented.");
-	}
-
-	void OnDetach() override
-	{
-		throw std::logic_error("The method or operation is not implemented.");
-	}
-
-	void OnUpdate(Hazel::TimeStep ts) override
-	{
-		throw std::logic_error("The method or operation is not implemented.");
-	}
-
-	void OnImGuiRender() override
-	{
-		throw std::logic_error("The method or operation is not implemented.");
-	}
 
 	void OnEvent(Hazel::Event& event) override
 	{
-		throw std::logic_error("The method or operation is not implemented.");
+		Hazel::EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<Hazel::KeyPressedEvent>(HZ_BIND_EVENT_FN(ExampleLayer::OnKeyPressed));
 	}
 
+private:
+	bool OnKeyPressed(Hazel::KeyPressedEvent& e)
+	{
+		if (e.GetKeyCode()==HZ_KEY_LEFT)
+		{
+			HZ_INFO("HAHA");
+		}
+		return false;
+	}
 };
 
 class DrawLayer : public Hazel::Layer
@@ -68,10 +61,10 @@ public:
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 		float squareVertices[3 * 7]{
-			-0.75f, -0.75f, 0.0f,
-			 0.75f, -0.75f, 0.0f,
-			 0.75f,  0.75f, 0.0f,
-			-0.75f,  0.75f, 0.0f,
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.5f,  0.5f, 0.0f,
+			-0.5f,  0.5f, 0.0f,
 		};
 
 		m_SquareVA.reset(VertexArray::Create());
@@ -95,6 +88,7 @@ public:
 			layout(location = 1) in vec4 a_Color;
 
 			uniform mat4 u_ViewProjectionMatrix;
+			uniform mat4 u_Transform;
 
 			out vec3 v_Position;
 			out vec4 v_Color;
@@ -103,7 +97,7 @@ public:
 			{
 				v_Position = a_Position;
 				v_Color = a_Color;
-				gl_Position = u_ViewProjectionMatrix * vec4(a_Position, 1.0);
+				gl_Position = u_ViewProjectionMatrix * u_Transform * vec4(a_Position, 1.0);
 			}
 		)";
 
@@ -132,10 +126,11 @@ public:
 			layout(location = 0) in vec3 a_Position;
 
 			uniform mat4 u_ViewProjectionMatrix;
+			uniform mat4 u_Transform;
 
 			void main()
 			{
-				gl_Position = u_ViewProjectionMatrix * vec4(a_Position, 1.0);
+				gl_Position = u_ViewProjectionMatrix * u_Transform * vec4(a_Position, 1.0);
 			}
 		)";
 
@@ -163,20 +158,25 @@ public:
 	{
 		HZ_TRACE("Delta time: {0}s [{1}ms]", ts.GetSeconds(), ts.GetMilliSeconds());
 
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_D))
+		// Camera Transform
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_A))
 			m_CameraPos.x -= m_MoveSpeed * ts;
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_A))
+		else if (Hazel::Input::IsKeyPressed(HZ_KEY_D))
 			m_CameraPos.x += m_MoveSpeed * ts;
 
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_W))
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_S))
 			m_CameraPos.y -= m_MoveSpeed * ts;
-		else if (Hazel::Input::IsKeyPressed(HZ_KEY_S))
+		else if (Hazel::Input::IsKeyPressed(HZ_KEY_W))
 			m_CameraPos.y += m_MoveSpeed * ts;
 
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_L))
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_E))
 			m_CameraRotation += m_RotSpeed * ts;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_J))
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_Q))
 			m_CameraRotation -= m_RotSpeed * ts;
+
+
+
+		// Rendering
 
 		Hazel::RenderCommand::SetClearColor({ .1f, .1f, .1f, 1 });
 		Hazel::RenderCommand::Clear();
@@ -186,7 +186,18 @@ public:
 
 		Hazel::Renderer::BeginScene(m_Camera);
 
-		Hazel::Renderer::Submit(m_Shader2, m_SquareVA);
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(.1f));
+
+		for (int x = 0; x < 20; x++)
+		{
+			for (int i = 0; i < 20; i++)
+			{
+				glm::vec3 pos(i * .11f, x * .11f, 0.0f);
+				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
+				Hazel::Renderer::Submit(m_Shader2, m_SquareVA, transform);
+			}
+		}
+
 		Hazel::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Hazel::Renderer::EndScene();
