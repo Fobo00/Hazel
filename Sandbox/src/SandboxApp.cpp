@@ -6,40 +6,33 @@ static bool showTest = true;
 
 class ExampleLayer : public Hazel::Layer
 {
+
 public:
-	ExampleLayer()
-		:Layer("Example")
+	void OnAttach() override
 	{
+		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-
-	void OnUpdate() override
+	void OnDetach() override
 	{
-		//HZ_INFO("ExampleLayer::Update()");
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_TAB	))
-		{
-			HZ_TRACE("Key Tab pressed!");
-		}
+		throw std::logic_error("The method or operation is not implemented.");
+	}
+
+	void OnUpdate(Hazel::TimeStep ts) override
+	{
+		throw std::logic_error("The method or operation is not implemented.");
 	}
 
 	void OnImGuiRender() override
 	{
-		ImGui::Begin("Test");
-		ImGui::Text("aha this test works");
-		ImGui::DragFloat("Float", new float);
-		ImGui::End();
+		throw std::logic_error("The method or operation is not implemented.");
 	}
 
 	void OnEvent(Hazel::Event& event) override
 	{
-		// HZ_INFO("{0}", e.ToString());
-		// HZ_TRACE("got Event");
-		if (event.GetEventType() == Hazel::EventType::KeyPressed)
-		{
-			Hazel::KeyPressedEvent& e = (Hazel::KeyPressedEvent&)event;
-			HZ_TRACE("{0}",(char)e.GetKeyCode());
-		}
+		throw std::logic_error("The method or operation is not implemented.");
 	}
+
 };
 
 class DrawLayer : public Hazel::Layer
@@ -166,23 +159,51 @@ public:
 	}
 
 
-	void OnUpdate() override
+	void OnUpdate(Hazel::TimeStep ts) override
 	{
-		using namespace Hazel;
-		RenderCommand::SetClearColor({ .1f, .1f, .1f, 1 });
-		RenderCommand::Clear();
+		HZ_TRACE("Delta time: {0}s [{1}ms]", ts.GetSeconds(), ts.GetMilliSeconds());
 
-		//m_Camera.SetPosition({ 0.5f, 0.5f, 0.0f });
-		m_Camera.SetRotation(45.0f);
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_D))
+			m_CameraPos.x -= m_MoveSpeed * ts;
+		else if (Hazel::Input::IsKeyPressed(HZ_KEY_A))
+			m_CameraPos.x += m_MoveSpeed * ts;
 
-		Renderer::BeginScene(m_Camera);
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_W))
+			m_CameraPos.y -= m_MoveSpeed * ts;
+		else if (Hazel::Input::IsKeyPressed(HZ_KEY_S))
+			m_CameraPos.y += m_MoveSpeed * ts;
 
-		Renderer::Submit(m_Shader2, m_SquareVA);
-		Renderer::Submit(m_Shader, m_VertexArray);
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_L))
+			m_CameraRotation += m_RotSpeed * ts;
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_J))
+			m_CameraRotation -= m_RotSpeed * ts;
 
-		Renderer::EndScene();
+		Hazel::RenderCommand::SetClearColor({ .1f, .1f, .1f, 1 });
+		Hazel::RenderCommand::Clear();
+
+		m_Camera.SetPosition(m_CameraPos);
+		m_Camera.SetRotation(m_CameraRotation);
+
+		Hazel::Renderer::BeginScene(m_Camera);
+
+		Hazel::Renderer::Submit(m_Shader2, m_SquareVA);
+		Hazel::Renderer::Submit(m_Shader, m_VertexArray);
+
+		Hazel::Renderer::EndScene();
 	}
 
+
+	void OnEvent(Hazel::Event& event) override
+	{
+		Hazel::EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<Hazel::KeyPressedEvent>(HZ_BIND_EVENT_FN(DrawLayer::OnKey));
+	}
+
+private:
+	bool OnKey(Hazel::KeyPressedEvent& event)
+	{
+		return false;
+	}
 private:
 	std::shared_ptr<Hazel::Shader> m_Shader;
 	std::shared_ptr<Hazel::VertexArray> m_VertexArray;
@@ -191,6 +212,10 @@ private:
 	std::shared_ptr<Hazel::VertexArray> m_SquareVA;
 
 	Hazel::OrthographicCamera m_Camera;
+	glm::vec3 m_CameraPos{};
+	float m_CameraRotation = 0.0f;
+	float m_MoveSpeed = 5.0f;
+	float m_RotSpeed = 180.0f;
 };
 
 class Sandbox : public Hazel::Application

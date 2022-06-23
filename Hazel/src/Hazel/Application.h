@@ -1,16 +1,15 @@
 #pragma once
 
 #include "Core.h"
-#include "Events/Event.h"
-#include "Hazel/Events/ApplicationEvent.h"
+
 #include "Window.h"
 #include "Hazel/LayerStack.h"
+#include "ImGui/ImGuiLayer.h"
+#include "Hazel/Events/Event.h"
+#include "Hazel/Events/ApplicationEvent.h"
 
-#include "Hazel/Renderer/Shader.h"
-#include "Hazel/Renderer/Buffer.h"
+#include "Hazel/Core/TimeStep.h"
 
-#include "Hazel/ImGui/ImGuiLayer.h"
-#include <Hazel/Renderer/VertexArray.h>
 
 namespace Hazel
 {
@@ -39,6 +38,8 @@ namespace Hazel
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
+		float m_lastFrameTime;
+	private:
 		static Application* s_Instance;
 	};
 

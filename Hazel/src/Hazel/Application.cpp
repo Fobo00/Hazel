@@ -3,6 +3,7 @@
 #include "Hazel/Input.h"
 #include "Hazel/Renderer/Buffer.h"
 #include "Hazel/Renderer/Renderer.h"
+#include <GLFW/glfw3.h>
 
 namespace Hazel
 {
@@ -30,8 +31,13 @@ namespace Hazel
 	{
 		while (m_Running)
 		{
+			float time = (float)glfwGetTime(); // Platform GetTime
+			TimeStep timeStep = time - m_lastFrameTime;
+			m_lastFrameTime = time;
+
+
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(timeStep);
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
@@ -43,7 +49,7 @@ namespace Hazel
 	}
 	void Application::OnEvent(Event& e)
 	{
-		EventDispacher dispacher(e);
+		EventDispatcher dispacher(e);
 		dispacher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
 		//if (dispacher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize))) return;
 		//HZ_CORE_TRACE("{0}", e.ToString());

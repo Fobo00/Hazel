@@ -36,7 +36,7 @@ namespace Hazel
 
 	class HAZEL_API Event
 	{
-		friend class EventDispacher;
+		friend class EventDispatcher;
 	public:
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
@@ -52,12 +52,12 @@ namespace Hazel
 		bool m_Handled = false;
 	};
 
-	class EventDispacher
+	class EventDispatcher
 	{
 		template<typename T>
 		using EventFn = std::function<bool(T&)>;
 	public:
-		EventDispacher(Event& event)
+		EventDispatcher(Event& event)
 			: m_Event(event)
 		{}
 

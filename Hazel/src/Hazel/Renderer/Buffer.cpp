@@ -28,7 +28,7 @@ namespace Hazel
 		default:
 			break;
 		case RendererApi::API::None:		HZ_CORE_ASSERT(false, "RenderApi::None is currently not supported!");
-		case RendererApi::API::OpenGL:	return new OpenGLIndexBuffer(indices, size);
+		case RendererApi::API::OpenGL:		return new OpenGLIndexBuffer(indices, size);
 		}
 
 		HZ_CORE_ASSERT(false, "Unknown RenderApi!");
