@@ -1,5 +1,8 @@
 #include "hzpch.h"
+
 #include <Hazel.h>
+#include "Platform/OpenGL/OpenGLShader.h"
+
 #include <ImGui/imgui.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,7 +13,6 @@ class ExampleLayer : public Hazel::Layer
 {
 
 public:
-
 	void OnEvent(Hazel::Event& event) override
 	{
 		Hazel::EventDispatcher dispatcher(event);
@@ -31,7 +33,7 @@ private:
 class DrawLayer : public Hazel::Layer
 {
 public:
-	DrawLayer() :Layer("Draw Layer"), m_Camera(-1.6f, 1.6f, -.9f, .9f) {}
+	DrawLayer() :Layer("Draw Layer"), m_Camera(-1.6f, 1.6f, -.9f, .9f), m_UColor(0.0f) {}
 
 	void OnAttach() override
 	{
@@ -117,10 +119,10 @@ public:
 		)";
 
 
-		m_Shader.reset(new Shader(vertexSrc, fragmentSrc));
+		m_Shader.reset(Shader::Create(vertexSrc, fragmentSrc));
 
 
-		std::string vertexSrc2 = R"(
+		std::string flatColorVertexSrc = R"(
 			#version 330 core
 
 			layout(location = 0) in vec3 a_Position;
@@ -134,18 +136,20 @@ public:
 			}
 		)";
 
-		std::string fragmentSrc2 = R"(
+		std::string flatColorFragmentSrc = R"(
 			#version 330 core
 
 			layout(location = 0) out vec4 color;
 
+			uniform vec4 u_Color;
+
 			void main()
 			{
-				color = vec4(0.2, 0.3, 0.8, 1.0);
+				color = u_Color;
 			}
 		)";
 
-		m_Shader2.reset(new Shader(vertexSrc2, fragmentSrc2));
+		m_FlatColorShader.reset(Shader::Create(flatColorVertexSrc, flatColorFragmentSrc));
 	}
 
 
@@ -170,9 +174,9 @@ public:
 			m_CameraPos.y += m_MoveSpeed * ts;
 
 		if (Hazel::Input::IsKeyPressed(HZ_KEY_E))
-			m_CameraRotation += m_RotSpeed * ts;
-		if (Hazel::Input::IsKeyPressed(HZ_KEY_Q))
 			m_CameraRotation -= m_RotSpeed * ts;
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_Q))
+			m_CameraRotation += m_RotSpeed * ts;
 
 
 
@@ -186,15 +190,22 @@ public:
 
 		Hazel::Renderer::BeginScene(m_Camera);
 
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(.1f));
+		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(.1f));
 
+		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_FlatColorShader)->Bind();
+
+		glm::vec4 redColor(0.8f, 0.2f, 0.3f, 1.0f);
 		for (int x = 0; x < 20; x++)
 		{
 			for (int i = 0; i < 20; i++)
 			{
 				glm::vec3 pos(i * .11f, x * .11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-				Hazel::Renderer::Submit(m_Shader2, m_SquareVA, transform);
+
+				if (i % 2 == 0) std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", redColor);
+				else std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4("u_Color", m_UColor);
+
+				Hazel::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
 			}
 		}
 
@@ -204,10 +215,13 @@ public:
 	}
 
 
-	void OnEvent(Hazel::Event& event) override
+	void OnImGuiRender() override
 	{
-		Hazel::EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<Hazel::KeyPressedEvent>(HZ_BIND_EVENT_FN(DrawLayer::OnKey));
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit4("ColorPicker", &m_UColor.x);
+		ImGui::End();
+
+		ImGui::TextColored({ 1.0f, 0.0f, 0.0f, 1.0f }, "Text");
 	}
 
 private:
@@ -219,7 +233,7 @@ private:
 	std::shared_ptr<Hazel::Shader> m_Shader;
 	std::shared_ptr<Hazel::VertexArray> m_VertexArray;
 
-	std::shared_ptr<Hazel::Shader> m_Shader2;
+	std::shared_ptr<Hazel::Shader> m_FlatColorShader;
 	std::shared_ptr<Hazel::VertexArray> m_SquareVA;
 
 	Hazel::OrthographicCamera m_Camera;
@@ -227,6 +241,8 @@ private:
 	float m_CameraRotation = 0.0f;
 	float m_MoveSpeed = 5.0f;
 	float m_RotSpeed = 180.0f;
+
+	glm::vec4 m_UColor;
 };
 
 class Sandbox : public Hazel::Application
